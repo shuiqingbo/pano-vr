@@ -1,0 +1,123 @@
+/* 预览页在通用样式（/style.css）之上的补充：
+   场景切换条 + 切换过渡。基础视觉沿用同一套 token。 */
+
+/* ---------- 场景切换条 ---------- */
+.scenes {
+  position: fixed;
+  z-index: 3;
+  left: var(--strip);
+  right: var(--strip);
+  /* 放在底部提示的上面一行 */
+  bottom: calc(var(--strip) + 62px);
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  /* 让滚动条不抢戏 */
+  scrollbar-width: thin;
+  scrollbar-color: var(--rule) transparent;
+}
+/* 必须显式处理 hidden：
+   UA 样式表里是 [hidden]{display:none}，优先级 (0,1,0)，
+   和上面的 .scenes (0,1,0) 相同 —— 作者样式表会覆盖 UA 样式表，
+   结果 hidden 属性形同虚设，单场景项目也会显示一条空条。
+   所以这里用 [hidden] 提升到 (0,2,0) 明确压住。 */
+.scenes[hidden] { display: none; }
+.scenes::-webkit-scrollbar { height: 4px; }
+.scenes::-webkit-scrollbar-thumb {
+  background: var(--rule);
+  border-radius: 2px;
+}
+
+.scene-chip {
+  appearance: none;
+  font: inherit;
+  flex: 0 0 auto;
+  display: grid;
+  gap: 0;
+  padding: 0;
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  background: rgba(20, 18, 17, 0.72);
+  backdrop-filter: blur(10px);
+  color: var(--ink);
+  cursor: pointer;
+  overflow: hidden;
+  position: relative;
+  transition: border-color 160ms ease, transform 160ms ease;
+}
+.scene-chip:hover { border-color: var(--brass); }
+.scene-chip:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 2px;
+}
+.scene-chip--active { border-color: var(--brass); }
+.scene-chip--active::after {
+  /* 用一个细色条表示"当前"，不用粗边框，免得跳动 */
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 2px;
+  background: var(--brass);
+}
+
+.scene-chip__img {
+  display: block;
+  width: 108px;
+  height: 54px;
+  object-fit: cover;
+  background: #1a1817;
+}
+.scene-chip__label {
+  display: block;
+  padding: 0.35em 0.6em;
+  font-size: 12px;
+  letter-spacing: 0.03em;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 108px;
+}
+.scene-chip--active .scene-chip__label { color: var(--brass); }
+
+/* ---------- 切换场景时的进度条 ----------
+   一条贴在顶部的细线，代替原来"整屏变黑"的过渡。
+   旧画面始终可见，进度是真实的（按 6 个面的加载完成数）。 */
+.loadbar {
+  position: fixed;
+  z-index: 5;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: transparent;
+  pointer-events: none;
+}
+/* 显式压住 [hidden]：UA 的 [hidden]{display:none} 优先级和这里相同，
+   作者样式会覆盖 UA 样式，不写这行 hidden 就失效。 */
+.loadbar[hidden] { display: none; }
+.loadbar > span {
+  display: block;
+  height: 100%;
+  width: 0%;
+  background: var(--brass);
+  transition: width 160ms ease;
+}
+
+/* 正在加载的那个缩略图给个呼吸感，让用户知道点到了 */
+.scene-chip--loading {
+  border-color: var(--brass);
+  opacity: 0.72;
+}
+.scene-chip--loading .scene-chip__label { color: var(--brass); }
+
+@media (prefers-reduced-motion: reduce) {
+  .loadbar > span, .scene-chip { transition: none; }
+}
+
+@media (max-width: 560px) {
+  .scenes { bottom: calc(var(--strip) + 54px); }
+  .scene-chip__img { width: 84px; height: 42px; }
+  .scene-chip__label { max-width: 84px; font-size: 11px; }
+}

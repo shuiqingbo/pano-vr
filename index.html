@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>客厅 · 全景环视</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+<canvas id="view"></canvas>
+
+<!-- 加载状态：切面解码期间显示，避免黑屏 -->
+<div id="boot" class="boot">
+  <div class="boot__inner">
+    <div class="boot__label">正在展开全景</div>
+    <div class="boot__bar"><span id="bootFill"></span></div>
+  </div>
+</div>
+
+<!-- 顶部：场景名与朝向刻度 -->
+<header class="hud hud--top">
+  <div class="scene">
+    <span class="scene__name" id="sceneName">客厅</span>
+    <span class="scene__meta" id="sceneMeta">2048² 面 · 6 面</span>
+  </div>
+  <div class="compass" aria-hidden="true">
+    <span class="compass__needle" id="compassNeedle">N</span>
+    <span class="compass__deg" id="compassDeg">0°</span>
+  </div>
+</header>
+
+<!-- 底部：操作提示与 VR 入口 -->
+<footer class="hud hud--bottom">
+  <p class="hint">
+    <span>拖动环视</span>
+    <span>滚轮 / 双指缩放</span>
+    <span>双击归位</span>
+  </p>
+  <button id="vrBtn" class="vr" type="button" hidden>进入 VR</button>
+</footer>
+
+<!-- 错误提示 -->
+<div id="err" class="err" hidden role="alert"></div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three/build/three.module.js",
+    "three/addons/": "./vendor/three/examples/jsm/"
+  }
+}
+</script>
+<script type="module" src="./app.js"></script>
+</body>
+</html>

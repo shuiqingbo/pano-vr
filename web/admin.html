@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>全景 VR · 管理</title>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/web/style.css">
+</head>
+<body class="admin">
+
+<header class="bar">
+  <h1 class="bar__title">全景 VR</h1>
+  <p class="bar__note">本地工具 · 上传后自动切片</p>
+</header>
+
+<main class="wrap">
+
+  <!-- 上传区 -->
+  <section class="panel">
+    <h2 class="panel__title">上传全景图</h2>
+    <p class="panel__hint">
+      支持多选。每张图是一个场景，同一次上传的图归入同一个项目，
+      预览页里可以互相切换。只接受 <strong>2:1</strong> 的等距柱状全景图
+      （RICOH THETA、Insta360 等导出的都符合）。
+    </p>
+
+    <div id="drop" class="drop" tabindex="0" role="button"
+         aria-label="点击选择或拖入全景图">
+      <span class="drop__label">点击选择图片，或把图片拖到这里</span>
+      <span class="drop__sub">JPG / PNG / WebP</span>
+      <input id="file" type="file" accept="image/*" multiple hidden>
+    </div>
+
+    <div id="queue" class="queue" hidden></div>
+  </section>
+
+  <!-- 项目列表 -->
+  <section class="panel">
+    <h2 class="panel__title">
+      项目
+      <span id="count" class="panel__count"></span>
+    </h2>
+    <div id="list" class="list"></div>
+  </section>
+
+</main>
+
+<div id="toast" class="toast" hidden role="status"></div>
+
+<script type="module" src="/web/admin.js"></script>
+</body>
+</html>

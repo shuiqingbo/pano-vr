@@ -1,0 +1,20 @@
+# 运行时数据：上传的全景原图 + 切好的面。
+# 体积大（一套房 11 个场景约 300MB），而且是个人素材，不该进版本库。
+data/
+
+# 测试产生的临时目录
+.tmp-switch/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# 本项目不需要 node_modules（Three.js 已放在 vendor/），防止误提交
+node_modules/
+
+# 编辑器 / 系统
+.DS_Store
+.idea/
+.vscode/
+*.swp

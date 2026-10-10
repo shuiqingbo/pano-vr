@@ -1,0 +1,20 @@
+{
+  "scene": "sample",
+  "source": "sample-panorama.jpg",
+  "sourceSize": [
+    8192,
+    4096
+  ],
+  "faceSize": 2048,
+  "quality": 90,
+  "order": [
+    "px",
+    "nx",
+    "py",
+    "ny",
+    "pz",
+    "nz"
+  ],
+  "preview": "sample_preview.jpg",
+  "generated": "2026-10-10 17:33:11"
+}

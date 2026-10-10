@@ -1,0 +1,231 @@
+/* 客厅全景环视 —— 视觉基调
+   图像是唯一的主角，界面是浮在照片上的精密仪器，不是卡片套件。
+   配色取自照片本身：暖石材 (168,158,148) 与室内灯光的黄铜色。 */
+
+:root {
+  /* 底色：暖调近黑，让画面外的留白读作"未点亮的空间"而不是 UI 灰 */
+  --void:   #0E0D0C;
+  --panel:  rgba(20, 18, 17, 0.72);
+  --ink:    #F2EDE6;
+  --ink-dim:rgba(242, 237, 230, 0.58);
+  --rule:   rgba(242, 237, 230, 0.16);
+  /* 唯一强调色：室内灯光的旧黄铜 */
+  --brass:  #C8A96E;
+
+  --strip:  clamp(16px, 2.4vw, 30px);
+  --font: "Jost", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: var(--void);
+  color: var(--ink);
+  font-family: var(--font);
+  font-weight: 400;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 画布铺满视口；视口变化时由 JS 同步分辨率 */
+#view {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: grab;
+  touch-action: none;
+}
+#view:active { cursor: grabbing; }
+#view:focus-visible { outline: 2px solid var(--brass); outline-offset: -4px; }
+
+/* ---------- HUD：贴边浮层 ---------- */
+.hud {
+  position: fixed;
+  z-index: 2;
+  display: flex;
+  gap: var(--strip);
+  pointer-events: none;          /* 默认穿透，只有控件本身可点 */
+  padding: var(--strip);
+}
+.hud > * { pointer-events: auto; }
+
+.hud--top {
+  inset: 0 0 auto 0;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.hud--bottom {
+  inset: auto 0 0 0;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+/* ---------- 场景名 ---------- */
+.scene {
+  display: flex;
+  flex-direction: column;
+  gap: 0.32em;
+}
+.scene__name {
+  font-size: clamp(19px, 2.3vw, 26px);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  text-shadow: 0 1px 14px rgba(0, 0, 0, 0.6);
+}
+.scene__meta {
+  font-size: 12px;
+  color: var(--ink-dim);
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.6);
+}
+
+/* ---------- 罗盘：真实的朝向读数，不是装饰 ---------- */
+.compass {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5em;
+  padding-top: 0.15em;
+}
+.compass__needle {
+  font-size: clamp(19px, 2.3vw, 26px);
+  font-weight: 500;
+  color: var(--brass);
+  line-height: 1;
+  min-width: 1.4em;
+  text-align: right;
+  text-shadow: 0 1px 14px rgba(0, 0, 0, 0.6);
+}
+.compass__deg {
+  font-size: 12px;
+  color: var(--ink-dim);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.06em;
+  min-width: 3.2em;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.6);
+}
+
+/* ---------- 底部操作提示 ---------- */
+.hint {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5em 1.35em;
+  font-size: 12.5px;
+  color: var(--ink-dim);
+  letter-spacing: 0.04em;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.6);
+}
+/* 用细分隔线代替圆点，和顶部的读数形成同一套仪器语言 */
+.hint span + span::before {
+  content: "";
+  display: inline-block;
+  width: 1px;
+  height: 0.85em;
+  margin-right: 1.35em;
+  vertical-align: -0.08em;
+  background: var(--rule);
+}
+/* 触摸设备上"滚轮"提示无意义，改说双指 */
+@media (hover: none) {
+  .hint span:nth-child(2) { display: none; }
+}
+
+/* ---------- VR 按钮：唯一的实心控件，把注意力收在一处 ---------- */
+.vr {
+  appearance: none;
+  border: 1px solid var(--brass);
+  background: transparent;
+  color: var(--brass);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  padding: 0.72em 1.5em;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: background-color 180ms ease, color 180ms ease, transform 180ms ease;
+  backdrop-filter: blur(8px);
+}
+.vr:hover { background: var(--brass); color: var(--void); }
+.vr:active { transform: scale(0.975); }
+.vr:focus-visible { outline: 2px solid var(--brass); outline-offset: 3px; }
+.vr:disabled {
+  border-color: var(--rule);
+  color: var(--ink-dim);
+  cursor: default;
+  background: transparent;
+  transform: none;
+}
+
+/* ---------- 加载 ---------- */
+.boot {
+  position: fixed;
+  inset: 0;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  background: var(--void);
+  transition: opacity 620ms ease, visibility 620ms;
+}
+.boot--done { opacity: 0; visibility: hidden; }
+
+.boot__inner { display: grid; gap: 1.1em; justify-items: center; }
+.boot__label {
+  font-size: 13px;
+  letter-spacing: 0.16em;
+  color: var(--ink-dim);
+}
+.boot__bar {
+  width: min(232px, 46vw);
+  height: 1px;
+  background: var(--rule);
+  overflow: hidden;
+}
+.boot__bar span {
+  display: block;
+  height: 100%;
+  width: 0%;
+  background: var(--brass);
+  transition: width 260ms ease;
+}
+
+/* ---------- 错误 ---------- */
+.err {
+  position: fixed;
+  z-index: 4;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  max-width: min(460px, 86vw);
+  padding: 1.5em 1.7em;
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-left: 2px solid var(--brass);
+  border-radius: 2px;
+  backdrop-filter: blur(14px);
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--ink);
+}
+.err code {
+  font-size: 12.5px;
+  color: var(--brass);
+  word-break: break-all;
+}
+
+/* 尊重"减少动态效果"偏好 */
+@media (prefers-reduced-motion: reduce) {
+  .vr, .boot, .boot__bar span { transition: none; }
+}
+
+@media (max-width: 560px) {
+  .scene__meta { display: none; }
+  .hint { font-size: 11.5px; }
+}
